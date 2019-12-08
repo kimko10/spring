@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+ 	
+ 	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver" />
+        <property name="url" value="jdbc:mariadb://localhost:3306/webdb" />
+        <property name="username" value="root" />
+        <property name="password" value="qufdl123456!" />
+    </bean>
+ 
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 맵퍼의 위치가 1곳일 경우 -->
+        <property name="mapperLocations" value="classpath:/mapper/**/*Mapper.xml" />
+        <!-- 맵퍼의 위치가 폴더별로 구분한다면
+        <property name="mapperLocations">
+        	<array>
+        		<value>classpath:/mapper/*Mapper.xml</value>
+        		<value>classpath:/mapper/**/*Mapper.xml</value>
+        	</array>
+        </property> -->
+        
+    </bean>
+ 
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory" />
+    </bean>
+    
+    <!-- Mapper interface로 DB연결하기 위한 설정 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.project.spring.*.service.impl" />
+	</bean>
+
+    
+    <!-- 트랜잭션 매니저 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<!-- Annotation 기반 트랜잭션 설정 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans>
+
+
